@@ -10,4 +10,5 @@ def read_csv_to_var(file_name):
 
 
 # function that takes a disaster name and returns the region desination
+
 # function that parses the date and returns the year

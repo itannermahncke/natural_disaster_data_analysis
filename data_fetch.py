@@ -1,11 +1,13 @@
-# This file contains code for fetching online data and porting it to a local
-# variable in the folder.
+"""
+This file contains code for fetching online data and porting it to a local
+variable in the folder.
+"""
 
 import tarfile
 import requests
 
 
-def write_to_csv():
+def write_to_csv(request, tarpath):
     """
     This function....
 
@@ -13,11 +15,8 @@ def write_to_csv():
 
     Returns
     """
-    r = requests.get(
-        "https://www.ncei.noaa.gov/archive/archive-management-system/OAS/bin/prd/jquery/download/209268.17.17.tar.gz",
-        timeout=30,
-    )
-    target_path = "/209268.17.17.tar.gz"
+    r = requests.get(request, timeout=30)
+    target_path = tarpath
     try:
         # check the status code
         # extract tar file to project folder
