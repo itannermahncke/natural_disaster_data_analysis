@@ -15,7 +15,7 @@ def read_csv_to_var(file_name):
 
 
 # function that takes a disaster name and index and returns the region desination
-def geo_locator(disaster_name, index):
+def geo_locator(disaster_name):
     """
     docs
     """
@@ -34,12 +34,12 @@ def geo_locator(disaster_name, index):
     disaster_location = []
     for _ in region_array:
         if _ in disaster_name:
-            disaster_location.append(_ + str(index))
+            disaster_location.append(_)
     if len(disaster_location) > 1:
         return None
     for _ in location_array:
         if _ in disaster_name:
-            disaster_location.append(_ + str(index))
+            disaster_location.append(_)
     if len(disaster_location) > 2:
         return None
     if len(disaster_location) == 2:
@@ -74,6 +74,22 @@ def geo_locator(disaster_name, index):
             if "West" in disaster_location[0] or "West" in disaster_location[1]:
                 return [x for x in disaster_location if "Northwest" not in x]
             return None
+        if "Plains" in disaster_location[0]:
+            disaster_location.clear()
+            disaster_location.append("Midwest")
+            return disaster_location
+        if "Northwest" in disaster_location[0]:
+            disaster_location.clear()
+            disaster_location.append("West")
+            return disaster_location
+        if "Southwest" in disaster_location[0]:
+            disaster_location.clear()
+            disaster_location.append("West")
+            return disaster_location
+        if "Southeast" in disaster_location[0]:
+            disaster_location.clear()
+            disaster_location.append("South")
+            return disaster_location
     return disaster_location
 
 
