@@ -11,7 +11,18 @@ def read_csv_to_var(file_name):
     """
     docs
     """
-    return pd.read_csv(file_name)
+    return pd.read_csv(
+        file_name,
+        header=0,
+        names=[
+            "Name",
+            "Disaster",
+            "Begin Date",
+            "End Date",
+            "Total CPI-Adjusted Cost (Millions of Dollars)",
+            "Deaths",
+        ],
+    )
 
 
 # function that takes a disaster name and index and returns the region desination

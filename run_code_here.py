@@ -14,9 +14,5 @@ disaster_data = dp.read_csv_to_var(
 )
 
 for i, row in disaster_data.iterrows():
-    print(row)
-    print(dp.geo_locator(row["Name"]))
-
-# 1) split dataframe into regions
-# 2) for each region, split into yearly data
-# 3) for each region-year, split into disaster data
+    print("The row is: " + row["Name"])
+    print("The Results are: ", dp.geo_locator(row["Name"]))
