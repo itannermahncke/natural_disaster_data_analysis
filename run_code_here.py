@@ -13,3 +13,7 @@ disaster_data = data_process.read_csv_to_var(
     "./0209268/17.17/data/0-data/events-US-1980-2023.csv"
 )
 print(disaster_data)
+
+# 1) split dataframe into regions
+# 2) for each region, split into yearly data
+# 3) for each region-year, split into disaster data

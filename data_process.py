@@ -1,7 +1,12 @@
+"""
+Helper functions for processing the data in our CSV into useful, bite-size
+dataframes that can be used to plot information.
+"""
+
 import pandas as pd
 
 
-# function that writes the csv to a variable
+# this function writes the csv to a variable
 def read_csv_to_var(file_name):
     """
     docs
@@ -9,6 +14,192 @@ def read_csv_to_var(file_name):
     return pd.read_csv(file_name)
 
 
-# function that takes a disaster name and returns the region desination
+# these functions help us replace the unwieldy eight-character date format with
+# the more general and more useful four-character year format
+def parse_year(date):
+    """
+    Examines a given date in string form and returns only the year.
 
-# function that parses the date and returns the year
+    Args:
+        date: a string representing a specific date of a disaster.
+
+    Returns: the first four characters of the date, representing the year.
+    """
+    return date[0:4]
+
+
+def parse_all_years(dataframe):
+    """
+    Reformats the Begin Date and End Date columns of a dataframe to a
+    four-character year format rather than an eight-character date format.
+
+    Args:
+        dataframe: a dataframe to reformat.
+
+    Returns: None.
+    """
+    for col in ["Begin Date", "End Date"]:
+        for i, date in dataframe[col]:
+            dataframe[i, "Begin Date"] = parse_year(date)
+
+
+# these functions will get us unique lists of the columns we will sort by
+def retrieve_unique_disaster_types(dataframe):
+    """
+    Returns a list of all different types of disasters within a given
+    dataframe of disasters.
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and their
+        type designations.
+
+    Returns: A list containing each unique disaster type.
+    """
+    return dataframe["Disaster"].unique()
+
+
+def retrieve_unique_years(dataframe):
+    """
+    Returns a list of all different possible starting years out of a dataframe
+    of different events.
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and the dates
+        that they occurred.
+
+    Returns: A list containing each unique possible starting year.
+    """
+    start_years = []
+    for _, event in dataframe:
+        start_years += parse_year(event["Begin Date"])
+    return list(set(start_years))
+
+
+# this function splits the main dataframe into four regional dataframes
+def sort_region(disaster_name):
+    """
+    Take the name of a disaster and identify its region. If it has no
+    associated region, return None, but otherwise return the region.
+
+    Args:
+        disaster_name: a string representing the name of a disaster.
+
+    Returns:
+        the standard name of the region the disaster is associated with,
+        or None if it cannot be sorted simply.
+    """
+    pass
+
+
+# these split functions can be used to get yearly and disasterly dataframes
+def generic_split_data(dataframe, split_by, child_group_set):
+    """
+    function that takes a dataframe of information and splits it into
+    multiple child dataframes based on information in a particular
+    column.
+
+    Args:
+    split_by: a string representing the column containing the information
+    with which to split up the dataframe.
+    child_group_set: a list representing the groups of data that each child
+    dataframe will contain.
+
+    Returns: A list of child dataframes that are each distinct from each
+    other in some particular column.
+    """
+    subframe_list = []
+    for subframe_cat in child_group_set:
+        subframe = dataframe[dataframe[split_by] == subframe_cat]
+        subframe_list += [subframe]
+    return subframe_list
+
+
+def split_by_year(dataframe):
+    """
+    Function that takes a dataframe and splits it into multiple child
+    dataframes by disaster starting year.
+
+    Args:
+        dataframe: a dataframe containing dated disasters. Note: this function
+        assumes that the dates here will be four-character years, NOT the
+        original eight-character specific date format.
+
+    Returns: A list of child dataframes, each associated with a particular
+    start year.
+    """
+    return generic_split_data(
+        dataframe, "Begin Date", retrieve_unique_years(dataframe)
+    )
+
+
+def split_by_disaster(dataframe):
+    """
+    Function that takes a dataframe and splits it into multiple child
+    dataframes by disaster type.
+
+    Args:
+        dataframe: a dataframe containing disasters and their types.
+
+    Returns: A list of child dataframes, each associated with a particular
+    type of disaster.
+    """
+    return generic_split_data(
+        dataframe, "Disaster", retrieve_unique_disaster_types(dataframe)
+    )
+
+
+# the following sum functions can be used for each step of summing.
+def generic_sum_by_type(dataframe, disaster_type, desired_sum):
+    """
+    Given a frame of data and a particular type of disaster, comb through
+    each event of the supplied type and sum up a desired value about them.
+
+    Args:
+        dataframe: the dataframe to parse.
+        disaster_type: a string representing the type of disaster to look for.
+        desired_sum: a string representing the numerical value to sum up
+        across disasters.
+    Returns:
+        An int representing the sum of the requested value for all of the
+        disasters of a certain type within the supplied dataframe.
+    """
+    sum_value = 0
+    for _, event in dataframe.iterrows():
+        if event["Disaster"] == disaster_type:
+            sum_value += int(event[desired_sum])
+    return sum_value
+
+
+def death_by_sum(dataframe, disaster_type):
+    """
+    Given a frame of data and a particular type of disaster, comb through
+    each event of the supplied type and sum up their total death count.
+
+    Args:
+        dataframe: the dataframe to parse.
+        disaster_type: a string representing the type of disaster to look for.
+    Returns:
+        An int representing the sum of the total deaths for all of the
+        disasters of a certain type within the supplied dataframe.
+    """
+    return generic_sum_by_type(dataframe, disaster_type, "Deaths")
+
+
+def cost_by_sum(dataframe, disaster_type):
+    """
+    Given a frame of data and a particular type of disaster, comb through
+    each event of the supplied type and sum up their total CPI-adjusted
+    cost.
+
+    Args:
+        dataframe: the dataframe to parse.
+        disaster_type: a string representing the type of disaster to look for.
+    Returns:
+        An int representing the sum of the CPI-adjusted cost for all of the
+        disasters of a certain type within the supplied dataframe.
+    """
+    return generic_sum_by_type(
+        dataframe,
+        disaster_type,
+        "Total CPI-Adjusted Cost (Millions of Dollars)",
+    )
