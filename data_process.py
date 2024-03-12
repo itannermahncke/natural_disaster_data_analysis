@@ -11,11 +11,22 @@ def read_csv_to_var(file_name):
     """
     docs
     """
-    return pd.read_csv(file_name)
+    return pd.read_csv(
+        file_name,
+        header=0,
+        names=[
+            "Name",
+            "Disaster",
+            "Begin Date",
+            "End Date",
+            "Total CPI-Adjusted Cost (Millions of Dollars)",
+            "Deaths",
+        ],
+    )
 
 
 # function that takes a disaster name and index and returns the region desination
-def geo_locator(disaster_name, index):
+def geo_locator(disaster_name):
     """
     docs
     """
@@ -34,12 +45,12 @@ def geo_locator(disaster_name, index):
     disaster_location = []
     for _ in region_array:
         if _ in disaster_name:
-            disaster_location.append(_ + str(index))
+            disaster_location.append(_)
     if len(disaster_location) > 1:
         return None
     for _ in location_array:
         if _ in disaster_name:
-            disaster_location.append(_ + str(index))
+            disaster_location.append(_)
     if len(disaster_location) > 2:
         return None
     if len(disaster_location) == 2:
