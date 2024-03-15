@@ -5,19 +5,24 @@ File for testing code until we have a comp essay.
 import data_fetch
 import data_process as dp
 
+# establish universal regions, plus a scrap bin
+region_list = ["w", "m", "s", "n", "empty"]
+
+# request dataset from online and store it in a variable
 data_fetch.write_to_csv(
     "https://www.ncei.noaa.gov/archive/archive-management-system/OAS/bin/prd/jquery/download/209268.17.17.tar.gz",
     "209268.17.17.tar.gz",
 )
-
-region_list = ["w", "m", "s", "n", "empty"]
-
 disaster_data = dp.read_csv_to_var(
     "./0209268/17.17/data/0-data/events-US-1980-2023.csv"
 )
 
+# log the disaster types and years found in the dataset
+unique_years = dp.retrieve_unique_disaster_types(disaster_data)
+unique_types = dp.retrieve_unique_years(disaster_data)
+
+# create a dictionary of each region and its associated dataframe
 region_dict = dp.fill_all_regions(disaster_data, region_list)
-print(region_dict)
 
 READY = False
 

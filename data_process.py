@@ -25,6 +25,68 @@ def read_csv_to_var(file_name):
     ).drop([0])
 
 
+# these functions help us replace the unwieldy eight-character date format with
+# the more general and more useful four-character year format
+def parse_year(date):
+    """
+    Examines a given date in string form and returns only the year.
+
+    Args:
+        date: a string representing a specific date of a disaster.
+
+    Returns: the first four characters of the date, representing the year.
+    """
+    return date[0:4]
+
+
+def parse_all_years(dataframe):
+    """
+    Reformats the Begin Date and End Date columns of a dataframe to a
+    four-character year format rather than an eight-character date format.
+
+    Args:
+        dataframe: a dataframe to reformat.
+
+    Returns: None.
+    """
+    for col in ["Begin Date", "End Date"]:
+        for i, date in dataframe[col].items():
+            dataframe[i, col] = parse_year(date)
+
+
+# these functions will get us unique lists of the columns we will sort by
+def retrieve_unique_disaster_types(dataframe):
+    """
+    Returns a list of all different types of disasters within a given
+    dataframe of disasters.
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and their
+        type designations.
+
+    Returns: A list containing each unique disaster type.
+    """
+    return dataframe["Disaster"].unique()
+
+
+def retrieve_unique_years(dataframe):
+    """
+    Returns a list of all different possible starting years out of a dataframe
+    of different events.
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and the dates
+        that they occurred.
+
+    Returns: A list containing each unique possible starting year.
+    """
+    start_years = []
+    for _, event_row in dataframe.iterrows():
+        print(event_row)
+        start_years += parse_year(event_row.iloc[2])
+    return list(set(start_years))
+
+
 # function that takes a disaster name and index and returns the region
 # destination
 def geo_locator(disaster_name):
@@ -117,81 +179,34 @@ def geo_locator(disaster_name):
     return "empty"
 
 
-# these functions help us replace the unwieldy eight-character date format with
-# the more general and more useful four-character year format
-def parse_year(date):
+def fill_one_region(dataframe, region_name):
     """
-    Examines a given date in string form and returns only the year.
-
-    Args:
-        date: a string representing a specific date of a disaster.
-
-    Returns: the first four characters of the date, representing the year.
+    docs
     """
-    return date[0:4]
+    region_df = pd.DataFrame(
+        columns=[
+            "Name",
+            "Disaster",
+            "Begin Date",
+            "End Date",
+            "Total CPI-Adjusted Cost (Millions of Dollars)",
+            "Deaths",
+        ]
+    )
+    for _, row in dataframe.iterrows():
+        if geo_locator(row["Name"]) == region_name:
+            region_df.loc[len(region_df)] = row
+    return region_df
 
 
-def parse_all_years(dataframe):
+def fill_all_regions(dataframe, region_list):
     """
-    Reformats the Begin Date and End Date columns of a dataframe to a
-    four-character year format rather than an eight-character date format.
-
-    Args:
-        dataframe: a dataframe to reformat.
-
-    Returns: None.
+    docs
     """
-    for col in ["Begin Date", "End Date"]:
-        for i, date in dataframe[col].items():
-            dataframe[i, col] = parse_year(date)
-
-
-# these functions will get us unique lists of the columns we will sort by
-def retrieve_unique_disaster_types(dataframe):
-    """
-    Returns a list of all different types of disasters within a given
-    dataframe of disasters.
-
-    Args:
-        dataframe: a dataframe containing a list of disasters and their
-        type designations.
-
-    Returns: A list containing each unique disaster type.
-    """
-    return dataframe["Disaster"].unique()
-
-
-def retrieve_unique_years(dataframe):
-    """
-    Returns a list of all different possible starting years out of a dataframe
-    of different events.
-
-    Args:
-        dataframe: a dataframe containing a list of disasters and the dates
-        that they occurred.
-
-    Returns: A list containing each unique possible starting year.
-    """
-    start_years = []
-    for _, event in dataframe:
-        start_years += parse_year(event["Begin Date"])
-    return list(set(start_years))
-
-
-# this function splits the main dataframe into four regional dataframes
-def sort_region(disaster_name):
-    """
-    Take the name of a disaster and identify its region. If it has no
-    associated region, return None, but otherwise return the region.
-
-    Args:
-        disaster_name: a string representing the name of a disaster.
-
-    Returns:
-        the standard name of the region the disaster is associated with,
-        or None if it cannot be sorted simply.
-    """
-    pass
+    df_list = {}
+    for region_name in region_list:
+        df_list[region_name] = fill_one_region(dataframe, region_name)
+    return df_list
 
 
 # these split functions can be used to get yearly and disasterly dataframes
