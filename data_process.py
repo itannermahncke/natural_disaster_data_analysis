@@ -22,7 +22,7 @@ def read_csv_to_var(file_name):
             "Total CPI-Adjusted Cost (Millions of Dollars)",
             "Deaths",
         ],
-    )
+    ).drop([0])
 
 
 # function that takes a disaster name and index and returns the region desination
@@ -47,12 +47,12 @@ def geo_locator(disaster_name):
         if _ in disaster_name:
             disaster_location.append(_)
     if len(disaster_location) > 1:
-        return None
+        return ["Empty"]
     for _ in location_array:
         if _ in disaster_name:
             disaster_location.append(_)
     if len(disaster_location) > 2:
-        return None
+        return ["Empty"]
     if len(disaster_location) == 2:
         if "Plains" in disaster_location[0] or "Plains" in disaster_location[1]:
             if (
@@ -60,14 +60,14 @@ def geo_locator(disaster_name):
                 or "Midwest" in disaster_location[1]
             ):
                 return [x for x in disaster_location if "Plains" not in x]
-            return None
+            return ["Empty"]
         if (
             "Southwest" in disaster_location[0]
             or "Southwest" in disaster_location[1]
         ):
             if "West" in disaster_location[0] or "West" in disaster_location[1]:
                 return [x for x in disaster_location if "Southwest" not in x]
-            return None
+            return ["Empty"]
         if (
             "Southeast" in disaster_location[0]
             or "Southeast" in disaster_location[1]
@@ -77,15 +77,57 @@ def geo_locator(disaster_name):
                 or "South" in disaster_location[1]
             ):
                 return [x for x in disaster_location if "Southeast" not in x]
-            return None
+            return ["Empty"]
         if (
             "Northwest" in disaster_location[0]
             or "Northwest" in disaster_location[1]
         ):
             if "West" in disaster_location[0] or "West" in disaster_location[1]:
                 return [x for x in disaster_location if "Northwest" not in x]
-            return None
-    return disaster_location
+            return "Empty"
+    if disaster_location:
+        if disaster_location[0] == "Southeast":
+            return "s"
+        if disaster_location[0] == "Northwest":
+            return "w"
+        if disaster_location[0] == "Southwest":
+            return "w"
+        if disaster_location[0] == "Plains":
+            return "m"
+        else:
+            return disaster_location[0]
+    else:
+        return "e"
+
+
+def fill_one_region(dataframe, region_name):
+    """
+    docs
+    """
+    region_df = pd.DataFrame(
+        columns=[
+            "Name",
+            "Disaster",
+            "Begin Date",
+            "End Date",
+            "Total CPI-Adjusted Cost (Millions of Dollars)",
+            "Deaths",
+        ]
+    )
+    for _, row in dataframe.iterrows():
+        if geo_locator(row["Name"]) == region_name:
+            region_df.loc[len(region_df)] = row
+    return region_df
+
+
+def fill_all_regions(dataframe, region_list):
+    """
+    docs
+    """
+    df_list = {}
+    for region_name in region_list:
+        df_list[region_name] = fill_one_region(dataframe, region_name)
+    return df_list
 
 
 # these functions help us replace the unwieldy eight-character date format with
@@ -113,8 +155,8 @@ def parse_all_years(dataframe):
     Returns: None.
     """
     for col in ["Begin Date", "End Date"]:
-        for i, date in dataframe[col]:
-            dataframe[i, "Begin Date"] = parse_year(date)
+        for i, date in dataframe[col].items():
+            dataframe[i, col] = parse_year(date)
 
 
 # these functions will get us unique lists of the columns we will sort by
@@ -144,25 +186,10 @@ def retrieve_unique_years(dataframe):
     Returns: A list containing each unique possible starting year.
     """
     start_years = []
-    for _, event in dataframe:
-        start_years += parse_year(event["Begin Date"])
+    for event_row in dataframe.itertuples():
+        print(event_row)
+        start_years += parse_year(event_row.iloc([0]))
     return list(set(start_years))
-
-
-# this function splits the main dataframe into four regional dataframes
-def sort_region(disaster_name):
-    """
-    Take the name of a disaster and identify its region. If it has no
-    associated region, return None, but otherwise return the region.
-
-    Args:
-        disaster_name: a string representing the name of a disaster.
-
-    Returns:
-        the standard name of the region the disaster is associated with,
-        or None if it cannot be sorted simply.
-    """
-    pass
 
 
 # these split functions can be used to get yearly and disasterly dataframes
@@ -181,11 +208,11 @@ def generic_split_data(dataframe, split_by, child_group_set):
     Returns: A list of child dataframes that are each distinct from each
     other in some particular column.
     """
-    subframe_list = []
+    subframe_dict = {}
     for subframe_cat in child_group_set:
         subframe = dataframe[dataframe[split_by] == subframe_cat]
-        subframe_list += [subframe]
-    return subframe_list
+        subframe_dict[subframe_cat] = subframe
+    return subframe_dict
 
 
 def split_by_year(dataframe):
