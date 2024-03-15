@@ -78,13 +78,18 @@ def retrieve_unique_years(dataframe):
         dataframe: a dataframe containing a list of disasters and the dates
         that they occurred.
 
-    Returns: A list containing each unique possible starting year.
+    Returns: A list containing each unique possible starting year in ascending
+    order, as ints.
     """
     start_years = []
-    for _, event_row in dataframe.iterrows():
-        print(event_row)
-        start_years += parse_year(event_row.iloc[2])
-    return list(set(start_years))
+    year_column = dataframe["Begin Date"]
+    for _, year in year_column.items():
+        start_years.append(int(parse_year(year)))
+    start_years.sort()
+    unique_years = list(set(start_years))
+    for i, year in enumerate(unique_years):
+        unique_years[i] = str(year)
+    return unique_years
 
 
 # function that takes a disaster name and index and returns the region
