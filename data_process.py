@@ -25,109 +25,96 @@ def read_csv_to_var(file_name):
     ).drop([0])
 
 
-# function that takes a disaster name and index and returns the region desination
+# function that takes a disaster name and index and returns the region
+# destination
 def geo_locator(disaster_name):
     """
     docs
     """
-    region_array = [
-        "Western",
-        "Midwest",
-        "Southern",
-        "Northeast",
-    ]
-    location_array = [
-        "Northwest",
-        "Southwest",
-        "Plains",
-        "Southeast",
-    ]
     disaster_location = []
-    for _ in region_array:
-        if _ in disaster_name:
-            disaster_location.append(_)
-    if len(disaster_location) > 1:
-        return ["Empty"]
-    for _ in location_array:
-        if _ in disaster_name:
-            disaster_location.append(_)
-    if len(disaster_location) > 2:
-        return ["Empty"]
-    if len(disaster_location) == 2:
-        if "Plains" in disaster_location[0] or "Plains" in disaster_location[1]:
-            if (
-                "Midwest" in disaster_location[0]
-                or "Midwest" in disaster_location[1]
-            ):
-                return [x for x in disaster_location if "Plains" not in x]
-            return ["Empty"]
-        if (
-            "Southwest" in disaster_location[0]
-            or "Southwest" in disaster_location[1]
-        ):
-            if "West" in disaster_location[0] or "West" in disaster_location[1]:
-                return [x for x in disaster_location if "Southwest" not in x]
-            return ["Empty"]
-        if (
-            "Southeast" in disaster_location[0]
-            or "Southeast" in disaster_location[1]
-        ):
-            if (
-                "South" in disaster_location[0]
-                or "South" in disaster_location[1]
-            ):
-                return [x for x in disaster_location if "Southeast" not in x]
-            return ["Empty"]
-        if (
-            "Northwest" in disaster_location[0]
-            or "Northwest" in disaster_location[1]
-        ):
-            if "West" in disaster_location[0] or "West" in disaster_location[1]:
-                return [x for x in disaster_location if "Northwest" not in x]
-            return "Empty"
-    if disaster_location:
-        if disaster_location[0] == "Southeast":
-            return "s"
-        if disaster_location[0] == "Northwest":
-            return "w"
-        if disaster_location[0] == "Southwest":
-            return "w"
-        if disaster_location[0] == "Plains":
-            return "m"
-        else:
-            return disaster_location[0]
-    else:
-        return "e"
+    south_set = [
+        "South ",
+        "Southern",
+        "Southeast",
+        "Southwest",
+        "Florida",
+        "Gulf ",
+        "Virginia",
+        "Texas",
+        "Mississippi",
+        "Georgia",
+        "Houston",
+        "Louisiana",
+        "Arkansas",
+        "Tennessee",
+        "Kentucky",
+        "Fort Lauderdale",
+        "Oklahoma",
+        "Virginia",
+        "Mid-Atlantic",
+        "Allen",
+        "Alicia",
+        "Elena",
+        "Allison",
+        "Hugo",
+        "Andrew",
+        "Alberto",
+        "Erin",
+        "Opal",
+        "Fran",
+        "Frances",
+        "Bonnie",
+        "Georges",
+    ]
+    west_set = [
+        "West ",
+        "Western",
+        "Northwest",
+        "Colorado",
+        "California",
+        "Oakland",
+        "Rockies",
+        "Arizona",
+        "Alaska",
+        "Hawaii",
+        "Iniki",
+    ]
+    midwest_set = [
+        "Midwest",
+        "Central",
+        "Plains",
+        "Kansas",
+        "Missouri",
+        "Illinois",
+        "Michigan",
+        "Minnesota",
+    ]
+    northeast_set = [
+        "Northeast",
+        "New England",
+        "Bob",
+    ]
 
+    for s_key in south_set:
+        if s_key in disaster_name:
+            disaster_location.append("s")
+            break
+    for w_key in west_set:
+        if w_key in disaster_name:
+            disaster_location.append("w")
+            break
+    for m_key in midwest_set:
+        if m_key in disaster_name:
+            disaster_location.append("m")
+            break
+    for n_key in northeast_set:
+        if n_key in disaster_name:
+            disaster_location.append("n")
+            break
 
-def fill_one_region(dataframe, region_name):
-    """
-    docs
-    """
-    region_df = pd.DataFrame(
-        columns=[
-            "Name",
-            "Disaster",
-            "Begin Date",
-            "End Date",
-            "Total CPI-Adjusted Cost (Millions of Dollars)",
-            "Deaths",
-        ]
-    )
-    for _, row in dataframe.iterrows():
-        if geo_locator(row["Name"]) == region_name:
-            region_df.loc[len(region_df)] = row
-    return region_df
-
-
-def fill_all_regions(dataframe, region_list):
-    """
-    docs
-    """
-    df_list = {}
-    for region_name in region_list:
-        df_list[region_name] = fill_one_region(dataframe, region_name)
-    return df_list
+    if len(disaster_location) == 1:
+        return disaster_location[0]
+    return "empty"
 
 
 # these functions help us replace the unwieldy eight-character date format with
@@ -186,10 +173,25 @@ def retrieve_unique_years(dataframe):
     Returns: A list containing each unique possible starting year.
     """
     start_years = []
-    for event_row in dataframe.itertuples():
-        print(event_row)
-        start_years += parse_year(event_row.iloc([0]))
+    for _, event in dataframe:
+        start_years += parse_year(event["Begin Date"])
     return list(set(start_years))
+
+
+# this function splits the main dataframe into four regional dataframes
+def sort_region(disaster_name):
+    """
+    Take the name of a disaster and identify its region. If it has no
+    associated region, return None, but otherwise return the region.
+
+    Args:
+        disaster_name: a string representing the name of a disaster.
+
+    Returns:
+        the standard name of the region the disaster is associated with,
+        or None if it cannot be sorted simply.
+    """
+    pass
 
 
 # these split functions can be used to get yearly and disasterly dataframes
