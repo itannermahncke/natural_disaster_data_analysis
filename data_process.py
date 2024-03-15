@@ -65,6 +65,45 @@ def geo_locator(disaster_name):
         "Frances",
         "Bonnie",
         "Georges",
+        "Floyd",
+        "Lili",
+        "Isidore",
+        "Isabel",
+        "Charley",
+        "Ivan",
+        "Jeanne",
+        "Dennis",
+        "Katrina",
+        "Rita",
+        "Wilma",
+        "Dolly",
+        "Gustav",
+        "Ike",
+        "Lee",
+        "Isaac",
+        "Matthew",
+        "Harvey",
+        "Irma",
+        "Maria",
+        "Florence",
+        "Michael",
+        "Dorian",
+        "Imelda",
+        "Hanna",
+        "Isaias",
+        "Laura",
+        "Sally",
+        "Delta",
+        "Zeta",
+        "Eta",
+        "Elsa",
+        "Fred",
+        "Hurricane Ida",
+        "Nicholas",
+        "Fiona",
+        "Hurricane Ian",
+        "Nicole",
+        "Idalia",
     ]
     west_set = [
         "West ",
@@ -93,6 +132,8 @@ def geo_locator(disaster_name):
         "Northeast",
         "New England",
         "Bob",
+        "Irene",
+        "Sandy",
     ]
 
     for s_key in south_set:
@@ -111,6 +152,13 @@ def geo_locator(disaster_name):
         if n_key in disaster_name:
             disaster_location.append("n")
             break
+
+    if (
+        disaster_name in "North/Central Texas Hail Storm (April 2016)"
+        or disaster_name in "North Texas Hail Storm (March 2016)"
+    ):
+        disaster_location.clear()
+        disaster_location.append("s")
 
     if len(disaster_location) == 1:
         return disaster_location[0]
