@@ -51,7 +51,7 @@ def parse_all_years(dataframe):
     """
     for col in ["Begin Date", "End Date"]:
         for i, date in dataframe[col].items():
-            dataframe[i, col] = parse_year(date)
+            dataframe[col].iloc[i - 1] = parse_year(date)
 
 
 # these functions will get us unique lists of the columns we will sort by
@@ -84,7 +84,7 @@ def retrieve_unique_years(dataframe):
     start_years = []
     year_column = dataframe["Begin Date"]
     for _, year in year_column.items():
-        start_years.append(int(parse_year(year)))
+        start_years.append(int(year))
     start_years.sort()
     unique_years = list(set(start_years))
     for i, year in enumerate(unique_years):
@@ -337,7 +337,7 @@ def generic_sum_by_type(dataframe, disaster_type, desired_sum):
     sum_value = 0
     for _, event in dataframe.iterrows():
         if event["Disaster"] == disaster_type:
-            sum_value += int(event[desired_sum])
+            sum_value += float(event[desired_sum])
     return sum_value
 
 
@@ -374,3 +374,61 @@ def cost_by_sum(dataframe, disaster_type):
         disaster_type,
         "Total CPI-Adjusted Cost (Millions of Dollars)",
     )
+
+
+def assemble_year_slice(dataframe):
+    """
+    docs
+
+    Args:
+        dataframe: a dataframe containing disaster information of a single
+        year and concerning a single US region.
+    """
+    region_year_slice = []
+    region_year_disaster_dict = split_by_disaster(dataframe)
+    # for each region-year-disaster, sum and append to region-year slice
+    for (
+        disaster_name,
+        disaster_frame,
+    ) in region_year_disaster_dict.items():
+        # sum values
+        sum_cost = cost_by_sum(disaster_frame, disaster_name)
+        sum_death = death_by_sum(disaster_frame, disaster_name)
+        # add data chunk to year slice
+        region_year_slice.append([disaster_name, sum_cost, sum_death])
+    return region_year_slice
+
+
+def assemble_region_loaf(dataframe):
+    """
+    Args:
+        dataframe: a dataframe containing information of disasters across all
+        years within a single US region.
+
+    Returns: A dictionary in which the keys are years and the values are 2D
+    arrays containing information on sum damages of each type of disaster
+    within that year (for the given US region).
+    """
+    region_loaf = {}
+    region_year_dict = split_by_year(dataframe)
+    # for each region-year dataframe, stack slices and append to region loaf
+    for region_year_name, region_year_frame in region_year_dict.items():
+        region_loaf[region_year_name] = assemble_year_slice(region_year_frame)
+    return region_loaf
+
+
+def organize_all_regions(region_dict):
+    """
+    Args:
+        region_dict: a dictionary in which the keys are the names of US regions
+        and the values are dataframes containing their unorganized values.
+
+    Returns: A dictionary in which the keys are the names of US regions and the
+    values are dictionaries in which the keys are years and the values are 2D
+    arrays containing information on sum damages of each type of disaster
+    within that year (for the given US region).
+    """
+    region_sorted_dict = {}
+    for region_name, region_frame in region_dict.items():
+        region_sorted_dict[region_name] = assemble_region_loaf(region_frame)
+    return region_sorted_dict

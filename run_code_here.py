@@ -9,42 +9,21 @@ import data_process as dp
 region_list = ["w", "m", "s", "n", "empty"]
 
 # request dataset from online and store it in a variable
-data_fetch.write_to_csv(
-    "https://www.ncei.noaa.gov/archive/archive-management-system/OAS/bin/prd/jquery/download/209268.17.17.tar.gz",
-    "209268.17.17.tar.gz",
-)
+# data_fetch.write_to_csv(
+# "https://www.ncei.noaa.gov/archive/archive-management-system/OAS/bin/prd/jquery/download/209268.17.17.tar.gz",
+# "209268.17.17.tar.gz",
+# )
 disaster_data = dp.read_csv_to_var(
     "./0209268/17.17/data/0-data/events-US-1980-2023.csv"
 )
 
+# modify dates to be less specific years
+dp.parse_all_years(disaster_data)
+
 # log the disaster types and years found in the dataset
-unique_years = dp.retrieve_unique_disaster_types(disaster_data)
-unique_types = dp.retrieve_unique_years(disaster_data)
+unique_types = dp.retrieve_unique_disaster_types(disaster_data)
+unique_years = dp.retrieve_unique_years(disaster_data)
 
-# create a dictionary of each region and its associated dataframe
+# convert the raw data (sorted by region) into graphable blocks of data
 region_dict = dp.fill_all_regions(disaster_data, region_list)
-
-READY = False
-
-if READY:
-    # for each region dataframe
-    region_sorted_list = []
-    for region_name, region_frame in region_dict.items():
-        region_loaf = {}
-        region_year_dict = dp.split_by_year(region_frame)
-        # for each region-year dataframe, stack slices and append to region loaf
-        for region_year_name, region_year_frame in region_year_dict.items():
-            region_year_slice = []
-            region_year_disaster_dict = dp.split_by_disaster(region_year_frame)
-            # for each region-year-disaster, sum and append to region-year slice
-            for (
-                disaster_name,
-                disaster_frame,
-            ) in region_year_disaster_dict.items():
-                # sum values
-                sum_cost = dp.cost_by_sum(disaster_frame, disaster_name)
-                sum_death = dp.death_by_sum(disaster_frame, disaster_name)
-                # add data chunk to year slice
-                region_year_slice.append([disaster_name, sum_cost, sum_death])
-            region_loaf[region_year_name] = region_year_slice
-        region_sorted_list.append(region_loaf)
+sorted_data_dict = dp.organize_all_regions(region_dict)
