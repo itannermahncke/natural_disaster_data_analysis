@@ -20,10 +20,6 @@ disaster_data = dp.read_csv_to_var(
 # modify dates to be less specific years
 dp.parse_all_years(disaster_data)
 
-# log the disaster types and years found in the dataset
-unique_types = dp.retrieve_unique_disaster_types(disaster_data)
-unique_years = dp.retrieve_unique_years(disaster_data)
-
 # convert the raw data (sorted by region) into graphable blocks of data
 region_dict = dp.fill_all_regions(disaster_data, region_list)
 sorted_data_dict = dp.organize_all_regions(region_dict)
