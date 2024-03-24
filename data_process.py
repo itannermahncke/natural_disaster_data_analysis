@@ -79,7 +79,7 @@ def retrieve_unique_years(dataframe):
         that they occurred.
 
     Returns: A list containing each unique possible starting year in ascending
-    order, as ints.
+    order, as strings.
     """
     start_years = []
     year_column = dataframe["Begin Date"]
@@ -376,34 +376,49 @@ def cost_by_sum(dataframe, disaster_type):
     )
 
 
-def assemble_one_disaster(dataframe, disaster):
+def assemble_one_disaster(dataframe, disaster, yrs):
     """
     Args:
         dataframe: A dataframe containing information of a single disaster
         type within a single region; the data spans all years.
+        yrs: a list containing all possible years. For use in adding relevant
+        zeroes where there is no data.
 
     Returns: Two arrays. One contains sum cost per year for the disaster type,
-    the other contains sum deaths per year for the disaster type.
+    the other contains sum deaths per year for the disaster type. The values
+    are all floats.
     """
     # split by year
-    year = split_by_year(dataframe)
+    years_dict = split_by_year(dataframe)
     cost_arr = []
     death_arr = []
-    # for each year
-    for _, year_frame in year.items():
-        # sum deaths, sum cost of the year for this disaster
-        # append to disaster-specific array (cost and death separated)
-        cost_arr.append(cost_by_sum(year_frame, disaster))
-        death_arr.append(death_by_sum(year_frame, disaster))
+    # for each year in unique years list
+    for year in yrs:
+        # if this disaster happened here this year
+        if year in years_dict:
+            # sum deaths, sum cost of the year for this disaster
+            # append to disaster-specific array (cost and death separated)
+            cost_arr.append(cost_by_sum(years_dict[year], disaster))
+            death_arr.append(death_by_sum(years_dict[year], disaster))
+        # if this disaster did not happen here this year
+        else:
+            # append zeroes as to not stagger the data
+            cost_arr.append(0)
+            death_arr.append(0)
     # now you have data across years for one disaster in one region
     return cost_arr, death_arr
 
 
-def assemble_region_data(dataframe):
+def assemble_region_data(dataframe, yrs, drs):
     """
     Args:
         dataframe: a dataframe containing information of all disasters across
         all years within a single US region.
+        yrs: a list containing all possible years. This will be carried to the
+        deepest function for use in adding relevant zeroes where there is no
+        data.
+        drs: a list containing all possible disasters. For use in adding
+        relevant zeroes where there is no data.
 
     Returns: Two dictionaries, one for cost and one for deaths. In both, the
     keys are disaster types and the values are arrays containing by-the-year
@@ -414,18 +429,26 @@ def assemble_region_data(dataframe):
     organized_disasters_deaths = {}
     # split up by disaster first
     disasters_dict = split_by_disaster(dataframe)
-    # for each disaster
-    for disaster_name, disaster_frame in disasters_dict.items():
-        cost_arr, death_arr = assemble_one_disaster(
-            disaster_frame, disaster_name
-        )
-        organized_disasters_cost[disaster_name] = cost_arr
-        organized_disasters_deaths[disaster_name] = death_arr
+    # for each disaster in disasters list
+    for disaster in drs:
+        # if this region has experienced this disaster
+        if disaster in disasters_dict:
+            cost_arr, death_arr = assemble_one_disaster(
+                disasters_dict[disaster], disaster, yrs
+            )
+            organized_disasters_cost[disaster] = cost_arr
+            organized_disasters_deaths[disaster] = death_arr
+        # if this region has not experienced this disaster
+        else:
+            # fill this disaster key's value with zeroes for every year
+            zeroes = [0] * (len(yrs) - 1)
+            organized_disasters_cost[disaster] = zeroes
+            organized_disasters_deaths[disaster] = zeroes
     # now you have data across years for all disasters in one region
     return organized_disasters_cost, organized_disasters_deaths
 
 
-def organize_regions(region_dict):
+def organize_regions(region_dict, yrs, drs):
     """
     A function that takes a dictionary containing regional data and returns
     that data sorted such that it is easily plottable by year, disaster type,
@@ -434,6 +457,12 @@ def organize_regions(region_dict):
     Args:
         region_dict: a dictionary in which the keys are the names of US regions
         and the values are dataframes containing their unorganized values.
+        yrs: a list containing all possible years. This will be carried to the
+        deepest function for use in adding relevant zeroes where there is no
+        data.
+        drs: a list containing all possible disasters. This will be carried to
+        the deepest function for use in adding relevant zeroes where there is no
+        data.
 
     Returns: A list containing two dictionaries; one for cost and deaths
     respectively. Each is a dictionary in which the keys are the names of US
@@ -444,7 +473,10 @@ def organize_regions(region_dict):
     regions_sorted_cost = {}
     regions_sorted_deaths = {}
     for region_name, region_frame in region_dict.items():
-        region_as_cost, region_as_deaths = assemble_region_data(region_frame)
+        print(f"*********Sorting {region_name}*********")
+        region_as_cost, region_as_deaths = assemble_region_data(
+            region_frame, yrs, drs
+        )
         regions_sorted_cost[region_name] = region_as_cost
         regions_sorted_deaths[region_name] = region_as_deaths
     return regions_sorted_cost, regions_sorted_deaths
