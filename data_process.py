@@ -447,4 +447,4 @@ def organize_regions(region_dict):
         region_as_cost, region_as_deaths = assemble_region_data(region_frame)
         regions_sorted_cost[region_name] = region_as_cost
         regions_sorted_deaths[region_name] = region_as_deaths
-    return regions_sorted_cost
+    return regions_sorted_cost, regions_sorted_deaths
