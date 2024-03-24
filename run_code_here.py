@@ -4,6 +4,7 @@ File for testing code until we have a comp essay.
 
 import data_fetch
 import data_process as dp
+import data_graph as dg
 
 # establish universal regions, plus a scrap bin
 region_list = ["w", "m", "s", "n", "empty"]
@@ -16,10 +17,3 @@ region_list = ["w", "m", "s", "n", "empty"]
 disaster_data = dp.read_csv_to_var(
     "./0209268/17.17/data/0-data/events-US-1980-2023.csv"
 )
-
-# modify dates to be less specific years
-dp.parse_all_years(disaster_data)
-
-# convert the raw data (sorted by region) into graphable blocks of data
-region_dict = dp.fill_all_regions(disaster_data, region_list)
-sorted_data_dict = dp.organize_all_regions(region_dict)
