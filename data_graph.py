@@ -5,28 +5,6 @@ Functions that graph pre-processed data.
 import pandas as pd
 
 
-def create_plottable_region(region_dict, region_name):
-    """
-    Args:
-        region_dict: A dictionary of regions in which the key is the name
-        of a region and the value is a dictionary of year keys and 2d
-        array values.
-        region_name: The name of a particular region whose data will be
-        copied into a plottable dataframe.
-
-    Returns: A dataframe that can be easily plotted such that the x-axis
-    is in years and the y-axis is in millions of dollars.
-    """
-    years_dict = region_dict[region_name]
-    for year, year_2d_array in years_dict.items():
-        # you want a list for each disaster
-        # the number of items is equal to the number of years
-        # if the disaster has no values for a year it should be zero
-        continue
-    # df = pd.DataFrame(data, columns=index)
-    # return df
-
-
 def plot_one_region(dataframe):
     """
     Plots a region dataframe.
@@ -47,3 +25,57 @@ def test_plot():
     df = pd.DataFrame({"speed": speed, "lifespan": lifespan}, index=index)
 
     return df
+
+
+def plottable_by_time(region_dict, region_name, year_buckets):
+    """
+    Works for both cost and deaths! This function creates a dataframe
+    representing data of ONE region for the purposes of plotting its
+    damages with respect to time. This function will be used for each
+    region so we can see how each of their costs changes with time.
+
+    Args:
+        region_dict: A dictionary of regions in which the key is the name
+        of a region and the value is a dictionary of disasters and their
+        damages across each unit of time.
+        region_name: A string representing the name of a particular region
+        whose data will be copied into a plottable dataframe.
+        year_buckets: A list representing the buckets of time we are using
+        for the purposes of the plot.
+
+    Returns: A dataframe that can be easily plotted such that the x-axis
+    is in years and the y-axis is damages (cost or deaths works).
+    """
+    disasters_dict = region_dict[region_name]
+    plottable_df = pd.DataFrame.from_dict(
+        disasters_dict, orient="index", columns=year_buckets
+    )
+    return plottable_df
+
+
+def plottable_by_region(region_dict, drs):
+    """
+    Works for both cost and deaths! This function creates a dataframe
+    representing data of ALL regions, ignoring time, for the purpose of
+    plottting each region's total damages across disaster types. This
+    function will be used only once per damage type, so we can compare
+    the sum damages between regions.
+
+    Args:
+        region_dict: A dictionary of regions in which the key is the name
+        of a region and the value is a dictionary of disasters and their
+        damages across each unit of time.
+        drs: A list of all possible disaster types.
+
+    Returns: A dataframe that can be easily plotted such that the x-axis
+    shows regions and the y-axis is damages (cost or deaths works).
+    """
+    regions_sums = {}
+    for region_name, region_val in region_dict.items():
+        region_damage_list = []
+        for _, disaster_damages in region_val.items():
+            region_damage_list.append(sum(disaster_damages))
+        regions_sums[region_name] = region_damage_list
+    plottable_df = pd.DataFrame.from_dict(regions_sums, orient="columns")
+    plottable_df.index = drs
+    return plottable_df
