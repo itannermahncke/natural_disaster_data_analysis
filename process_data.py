@@ -320,63 +320,58 @@ def split_by_disaster(dataframe):
 
 
 # the following sum functions can be used for each step of summing.
-def generic_sum_by_type(dataframe, disaster_type, desired_sum):
+def generic_sum_by_type(dataframe, desired_sum):
     """
-    Given a frame of data and a particular type of disaster, comb through
-    each event of the supplied type and sum up a desired value about them.
+    Given a frame of data, comb through each event and sum up a desired
+    value about them.
 
     Args:
         dataframe: the dataframe to parse.
-        disaster_type: a string representing the type of disaster to look for.
         desired_sum: a string representing the numerical value to sum up
         across disasters.
     Returns:
         An int representing the sum of the requested value for all of the
-        disasters of a certain type within the supplied dataframe.
+        disasters within the supplied dataframe.
     """
     sum_value = 0
     for _, event in dataframe.iterrows():
-        if event["Disaster"] == disaster_type:
-            sum_value += float(event[desired_sum])
+        sum_value += float(event[desired_sum])
     return sum_value
 
 
-def death_by_sum(dataframe, disaster_type):
+def death_by_sum(dataframe):
     """
-    Given a frame of data and a particular type of disaster, comb through
-    each event of the supplied type and sum up their total death count.
+    Given a frame of data, comb through each event of the supplied type
+    and sum up their total death count.
 
     Args:
         dataframe: the dataframe to parse.
-        disaster_type: a string representing the type of disaster to look for.
     Returns:
         An int representing the sum of the total deaths for all of the
         disasters of a certain type within the supplied dataframe.
     """
-    return generic_sum_by_type(dataframe, disaster_type, "Deaths")
+    return generic_sum_by_type(dataframe, "Deaths")
 
 
-def cost_by_sum(dataframe, disaster_type):
+def cost_by_sum(dataframe):
     """
-    Given a frame of data and a particular type of disaster, comb through
+    Given a frame of data, comb through
     each event of the supplied type and sum up their total CPI-adjusted
     cost.
 
     Args:
         dataframe: the dataframe to parse.
-        disaster_type: a string representing the type of disaster to look for.
     Returns:
         An int representing the sum of the CPI-adjusted cost for all of the
         disasters of a certain type within the supplied dataframe.
     """
     return generic_sum_by_type(
         dataframe,
-        disaster_type,
         "Total CPI-Adjusted Cost (Millions of Dollars)",
     )
 
 
-def assemble_one_disaster(dataframe, disaster, yrs):
+def assemble_one_disaster(dataframe, yrs):
     """
     Args:
         dataframe: A dataframe containing information of a single disaster
@@ -398,8 +393,8 @@ def assemble_one_disaster(dataframe, disaster, yrs):
         if year in years_dict:
             # sum deaths, sum cost of the year for this disaster
             # append to disaster-specific array (cost and death separated)
-            cost_arr.append(cost_by_sum(years_dict[year], disaster))
-            death_arr.append(death_by_sum(years_dict[year], disaster))
+            cost_arr.append(cost_by_sum(years_dict[year]))
+            death_arr.append(death_by_sum(years_dict[year]))
         # if this disaster did not happen here this year
         else:
             # append zeroes as to not stagger the data
@@ -434,7 +429,7 @@ def assemble_region_data(dataframe, yrs, drs):
         # if this region has experienced this disaster
         if disaster in disasters_dict:
             cost_arr, death_arr = assemble_one_disaster(
-                disasters_dict[disaster], disaster, yrs
+                disasters_dict[disaster], yrs
             )
             organized_disasters_cost[disaster] = cost_arr
             organized_disasters_deaths[disaster] = death_arr
@@ -473,7 +468,6 @@ def organize_regions(region_dict, yrs, drs):
     regions_sorted_cost = {}
     regions_sorted_deaths = {}
     for region_name, region_frame in region_dict.items():
-        print(f"*********Sorting {region_name}*********")
         region_as_cost, region_as_deaths = assemble_region_data(
             region_frame, yrs, drs
         )
