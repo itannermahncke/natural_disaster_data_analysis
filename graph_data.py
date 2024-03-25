@@ -9,7 +9,7 @@ def plot_one_region(dataframe):
     """
     Plots a region dataframe.
     """
-    dataframe.plot.bar(stacked=True)
+    dataframe.plot.bar(rot=1, stacked=True)
 
 
 def test_plot():
@@ -47,6 +47,7 @@ def plottable_by_time(region_dict, region_name, year_buckets):
     is in years and the y-axis is damages (cost or deaths works).
     """
     disasters_dict = region_dict[region_name]
+    print(disasters_dict)
     plottable_df = pd.DataFrame.from_dict(
         disasters_dict, orient="index", columns=year_buckets
     )
@@ -76,6 +77,7 @@ def plottable_by_region(region_dict, drs):
         for _, disaster_damages in region_val.items():
             region_damage_list.append(sum(disaster_damages))
         regions_sums[region_name] = region_damage_list
-    plottable_df = pd.DataFrame.from_dict(regions_sums, orient="columns")
-    plottable_df.index = drs
+    plottable_df = pd.DataFrame.from_dict(
+        regions_sums, orient="index", columns=drs
+    )
     return plottable_df
