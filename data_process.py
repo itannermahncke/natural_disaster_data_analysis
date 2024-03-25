@@ -468,7 +468,7 @@ def organize_regions(region_dict, yrs, drs):
     respectively. Each is a dictionary in which the keys are the names of US
     regions and the values are dictionaries in which the keys are disaster
     types and the values are arrays containing information on sum damages
-    (cost or deaths)of that disaster type for each year.
+    (cost or deaths) of that disaster type for each year.
     """
     regions_sorted_cost = {}
     regions_sorted_deaths = {}
