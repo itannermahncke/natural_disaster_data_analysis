@@ -231,19 +231,19 @@ def geo_locator(disaster_name):
 
     for s_key in south_set:
         if s_key in disaster_name:
-            disaster_location.append("s")
+            disaster_location.append("Southern")
             break
     for w_key in west_set:
         if w_key in disaster_name:
-            disaster_location.append("w")
+            disaster_location.append("Western")
             break
     for m_key in midwest_set:
         if m_key in disaster_name:
-            disaster_location.append("m")
+            disaster_location.append("Midwestern")
             break
     for n_key in northeast_set:
         if n_key in disaster_name:
-            disaster_location.append("n")
+            disaster_location.append("Northern")
             break
 
     if (
@@ -495,8 +495,8 @@ def assemble_region_data(dataframe, yrs, drs, yr_buckets):
             organized_disasters_deaths[disaster] = death_arr
         # if this region has not experienced this disaster
         else:
-            # fill this disaster key's value with zeroes for every year
-            zeroes = [0] * len(yrs)
+            # fill this disaster key's value with zeroes for every year group
+            zeroes = [0] * math.ceil(len(yrs) / yr_buckets)
             organized_disasters_cost[disaster] = zeroes
             organized_disasters_deaths[disaster] = zeroes
     # now you have data across years for all disasters in one region
