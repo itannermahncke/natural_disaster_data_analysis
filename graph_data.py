@@ -42,7 +42,6 @@ def plottable_by_time(region_dict, region_name, year_buckets):
     is in years and the y-axis is damages (cost or deaths works).
     """
     disasters_dict = region_dict[region_name]
-    print(disasters_dict)
     plottable_df = pd.DataFrame.from_dict(disasters_dict)
     plottable_df.index = year_buckets
     return plottable_df
