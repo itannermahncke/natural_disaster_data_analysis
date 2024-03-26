@@ -1,5 +1,9 @@
 """
 Functions that graph pre-processed data.
+
+This file uses one import to help graph the data: pandas.
+pandas is used to manipulate pandas dataframes so they can be turned into
+effective visualizations.
 """
 
 import pandas as pd
@@ -7,7 +11,13 @@ import pandas as pd
 
 def plot_dataframe(dataframe, rotation):
     """
-    Plots a region dataframe.
+    Given a dataframe and an int to help determine the orientation of the
+    graph, plot a bar plot from the dataframe.
+
+    Args:
+        dataframe: A dataframe containing the data to plot.
+        rotation: An int representing the angle by which to rotate the graph if
+        necessary.
     """
     dataframe.plot.bar(rot=rotation, stacked=True)
 
@@ -25,6 +35,8 @@ def plottable_by_time(region_dict, region_name, year_buckets):
         damages across each unit of time.
         region_name: A string representing the name of a particular region
         whose data will be copied into a plottable dataframe.
+        year_buckets: A list with strings representing the grouped time
+        periods.
 
     Returns: A dataframe that can be easily plotted such that the x-axis
     is in years and the y-axis is damages (cost or deaths works).
@@ -41,8 +53,8 @@ def plottable_by_region(region_dict, drs):
     Works for both cost and deaths! This function creates a dataframe
     representing data of ALL regions, ignoring time, for the purpose of
     plottting each region's total damages across disaster types. This
-    function will be used only once per damage type, so we can compare
-    the sum damages between regions.
+    function will be used once for cost of damages and once for deaths
+    so we can compare the sum of damages/deaths across regions.
 
     Args:
         region_dict: A dictionary of regions in which the key is the name
@@ -51,7 +63,7 @@ def plottable_by_region(region_dict, drs):
         drs: A list of all possible disaster types.
 
     Returns: A dataframe that can be easily plotted such that the x-axis
-    shows regions and the y-axis is damages (cost or deaths works).
+    shows regions and the y-axis is damages/deaths.
     """
     regions_sums = {}
     for region_name, region_val in region_dict.items():

@@ -2,7 +2,8 @@
 This file contains code for fetching online data and porting it to a local
 variable in the folder.
 
-It uses two imports necessary to retrieve the data: tarfile and requests.
+This file uses two imports to help retrieve the data: tarfile and
+requests.
 requests is used to query the National Centers for Environmental Information
 (NCEI) for the dataset that we want to use and put it in a folder (line 24).
 tarfile is used to extract the data (line 33) from its natural format
