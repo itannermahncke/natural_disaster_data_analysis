@@ -9,7 +9,7 @@ def plot_dataframe(dataframe):
     """
     Plots a region dataframe.
     """
-    dataframe.plot.bar(rot=1, stacked=True)
+    dataframe.plot.bar(rot=90, stacked=True)
 
 
 def test_plot():
