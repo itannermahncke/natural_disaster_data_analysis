@@ -2,7 +2,7 @@
 This file contains helper functions for processing the data in our CSV into
 useful, bite-size dataframes that can be used to plot information.
 
-It uses two imports necessary to process the data: pandas and math.
+This file uses two imports to help process the data: pandas and math.
 pandas is used to convert the data in csv format to a pandas dataframe which we
 can parse much more easily.
 math is used to help divide the years covered by the dataset into more
