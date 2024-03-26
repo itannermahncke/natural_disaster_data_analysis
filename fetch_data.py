@@ -24,7 +24,7 @@ def write_to_csv(request, tarpath):
             file.write(request.content)
 
         with tarfile.open(target_path, "r:gz") as tar_file:
-            tar_file.extractall()
+            tar_file.extractall(filter="fully_trusted")
 
     except FileNotFoundError:
         print("File name does not exist; please try again")
