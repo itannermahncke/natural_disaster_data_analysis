@@ -1,6 +1,10 @@
 """
-Helper functions for processing the data in our CSV into useful, bite-size
-dataframes that can be used to plot information.
+This file contains helper functions for processing the data in our CSV into
+useful, bite-size dataframes that can be used to plot information.
+
+It uses one import necessary to process the data: pandas.
+pandas is used to convert the data in csv format to a pandas dataframe which we
+can parse much more easily.
 """
 
 import pandas as pd
@@ -9,7 +13,15 @@ import pandas as pd
 # this function writes the csv to a variable
 def read_csv_to_var(file_name):
     """
-    docs
+    Given the file name of the csv which is the component of the downloaded
+    dataset that we used to generate our visualizations, convert the data in it
+    to a properly formatted pandas dataframe.
+
+    Args:
+        file_name: a string representing the name of the csv we use to generate
+        our pandas dataframe and ultimately our visualizations.
+
+    Returns: the pandas dataframe created from the file.
     """
     return pd.read_csv(
         file_name,
@@ -32,9 +44,9 @@ def parse_year(date):
     Examines a given date in string form and returns only the year.
 
     Args:
-        date: a string representing a specific date of a disaster.
+        date: a string representing the specific date of a disaster.
 
-    Returns: the first four characters of the date, representing the year.
+    Returns: a string representing the year (first four chars of the date).
     """
     return date[0:4]
 
@@ -46,8 +58,6 @@ def parse_all_years(dataframe):
 
     Args:
         dataframe: a dataframe to reformat.
-
-    Returns: None.
     """
     for col in ["Begin Date", "End Date"]:
         for i, date in dataframe[col].items():
@@ -64,7 +74,7 @@ def retrieve_unique_disaster_types(dataframe):
         dataframe: a dataframe containing a list of disasters and their
         type designations.
 
-    Returns: A list containing each unique disaster type.
+    Returns: A list containing each unique disaster type (as a string).
     """
     return dataframe["Disaster"].unique()
 
@@ -96,7 +106,22 @@ def retrieve_unique_years(dataframe):
 # destination
 def geo_locator(disaster_name):
     """
-    docs
+    Given the name of a disaster, parses the name for indicators corresponding
+    to the various geographical regions of the U.S. (as divided in the census).
+    The indicators are hardcoded based on the terminology used in the dataset
+    in order to capture as much of the data as possible. Assumptions were made
+    to fit disasters to regions where they make sense. If a disaster's name
+    matched with multiple regions or had names that were ambiguous and did not
+    match with a particular region, that row of data would go unused in
+    visualizations (indicated by returning "empty").
+
+    Args:
+        disaster_name: a string containing the Name column of the pandas
+        dataframe.
+
+    Returns: A string indicating the region the disaster affected:
+    "n", "w", "m", "s", or "empty" if a region could not be determined.
+    order, as strings.
     """
     disaster_location = []
     south_set = [
@@ -221,6 +246,9 @@ def geo_locator(disaster_name):
             break
 
     if (
+        # These two disasters both had names that the function could not parse
+        # effectively, but are clear to a human reader that they belong in the
+        # south.
         disaster_name in "North/Central Texas Hail Storm (April 2016)"
         or disaster_name in "North Texas Hail Storm (March 2016)"
     ):
