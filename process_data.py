@@ -8,6 +8,7 @@ can parse much more easily.
 """
 
 import pandas as pd
+import math
 
 
 # this function writes the csv to a variable
@@ -399,13 +400,39 @@ def cost_by_sum(dataframe):
     )
 
 
-def assemble_one_disaster(dataframe, yrs):
+def sum_years_in_buckets(num_list, bucket_size):
+    """
+    Given an list of ints of a certain length, sum the values into given
+    bucket sizes and return a list of the newly grouped data. For example:
+    if the original length is 44 and the bucket size is 5, return a new list
+    of length 9.
+
+    Args:
+        num_list: A list of ints to be resized.
+        bucket_size: The number of each ints to be summed per item in the
+        returned list. This should be a factor of the length of num_list.
+
+    Returns: A list of ints representing the regrouped ints in num_list. The
+    length of this list will be equal to the length of num_list divided by
+    the bucket size.
+    """
+    bucket_list = []
+    for _ in range(0, math.ceil(len(num_list) / bucket_size)):
+        bucket = sum(num_list[0 : min(bucket_size, len(num_list))])
+        bucket_list.append(bucket)
+        num_list = num_list[bucket_size : len(num_list)]
+    return bucket_list
+
+
+def assemble_one_disaster(dataframe, yrs, yr_buckets):
     """
     Args:
         dataframe: A dataframe containing information of a single disaster
         type within a single region; the data spans all years.
         yrs: a list containing all possible years. For use in adding relevant
         zeroes where there is no data.
+        yr_buckets: an int representing the number of years in one group. For
+        example, if we were grouping by decade, this variable would be 10.
 
     Returns: Two arrays. One contains sum cost per year for the disaster type,
     the other contains sum deaths per year for the disaster type. The values
@@ -428,11 +455,14 @@ def assemble_one_disaster(dataframe, yrs):
             # append zeroes as to not stagger the data
             cost_arr.append(0)
             death_arr.append(0)
-    # now you have data across years for one disaster in one region
-    return cost_arr, death_arr
+    # now you have data across years for one disaster in one region, grouped
+    return (
+        sum_years_in_buckets(cost_arr, yr_buckets),
+        sum_years_in_buckets(death_arr, yr_buckets),
+    )
 
 
-def assemble_region_data(dataframe, yrs, drs):
+def assemble_region_data(dataframe, yrs, drs, yr_buckets):
     """
     Args:
         dataframe: a dataframe containing information of all disasters across
@@ -442,6 +472,8 @@ def assemble_region_data(dataframe, yrs, drs):
         data.
         drs: a list containing all possible disasters. For use in adding
         relevant zeroes where there is no data.
+        yr_buckets: an int representing the number of years in one group. For
+        example, if we were grouping by decade, this variable would be 10.
 
     Returns: Two dictionaries, one for cost and one for deaths. In both, the
     keys are disaster types and the values are arrays containing by-the-year
@@ -457,7 +489,7 @@ def assemble_region_data(dataframe, yrs, drs):
         # if this region has experienced this disaster
         if disaster in disasters_dict:
             cost_arr, death_arr = assemble_one_disaster(
-                disasters_dict[disaster], yrs
+                disasters_dict[disaster], yrs, yr_buckets
             )
             organized_disasters_cost[disaster] = cost_arr
             organized_disasters_deaths[disaster] = death_arr
@@ -471,7 +503,7 @@ def assemble_region_data(dataframe, yrs, drs):
     return organized_disasters_cost, organized_disasters_deaths
 
 
-def organize_regions(region_dict, yrs, drs):
+def organize_regions(region_dict, yrs, drs, buckets):
     """
     A function that takes a dictionary containing regional data and returns
     that data sorted such that it is easily plottable by year, disaster type,
@@ -486,6 +518,8 @@ def organize_regions(region_dict, yrs, drs):
         drs: a list containing all possible disasters. This will be carried to
         the deepest function for use in adding relevant zeroes where there is no
         data.
+        buckets: an int representing the number of years in one group. For
+        example, if we were grouping by decade, this variable would be 10.
 
     Returns: A list containing two dictionaries; one for cost and deaths
     respectively. Each is a dictionary in which the keys are the names of US
@@ -497,7 +531,7 @@ def organize_regions(region_dict, yrs, drs):
     regions_sorted_deaths = {}
     for region_name, region_frame in region_dict.items():
         region_as_cost, region_as_deaths = assemble_region_data(
-            region_frame, yrs, drs
+            region_frame, yrs, drs, buckets
         )
         regions_sorted_cost[region_name] = region_as_cost
         regions_sorted_deaths[region_name] = region_as_deaths
