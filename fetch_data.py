@@ -27,16 +27,16 @@ def write_to_csv(request, tarpath):
         tarpath: a string representing the destination folder for the
         downloaded and extracted dataset.
     """
-    r = requests.get(request, timeout=30)
+    request = requests.get(request, timeout=30)
     target_path = tarpath
     try:
         # check the status code
         # extract tar file to project folder
-        with open(target_path, "wb") as f:
-            f.write(r.content)
+        with open(target_path, "wb") as file:
+            file.write(request.content)
 
-        with tarfile.open(target_path, "r:gz") as f2:
-            f2.extractall()
+        with tarfile.open(target_path, "r:gz") as tar_file:
+            tar_file.extractall(filter="fully_trusted")
 
     except FileNotFoundError:
         print("File name does not exist; please try again")
