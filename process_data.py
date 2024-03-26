@@ -2,13 +2,15 @@
 This file contains helper functions for processing the data in our CSV into
 useful, bite-size dataframes that can be used to plot information.
 
-It uses one import necessary to process the data: pandas.
+It uses two imports necessary to process the data: pandas and math.
 pandas is used to convert the data in csv format to a pandas dataframe which we
 can parse much more easily.
+math is used to help divide the years covered by the dataset into more
+digestible groups with the ceil function.
 """
 
-import pandas as pd
 import math
+import pandas as pd
 
 
 # this function writes the csv to a variable
@@ -121,7 +123,7 @@ def geo_locator(disaster_name):
         dataframe.
 
     Returns: A string indicating the region the disaster affected:
-    "n", "w", "m", "s", or "empty" if a region could not be determined.
+    "Northeastern", "Western", "Midwestern", "Southern", or "empty" if a region could not be determined.
     order, as strings.
     """
     disaster_location = []
@@ -243,7 +245,7 @@ def geo_locator(disaster_name):
             break
     for n_key in northeast_set:
         if n_key in disaster_name:
-            disaster_location.append("Northern")
+            disaster_location.append("Northeastern")
             break
 
     if (
@@ -254,7 +256,7 @@ def geo_locator(disaster_name):
         or disaster_name in "North Texas Hail Storm (March 2016)"
     ):
         disaster_location.clear()
-        disaster_location.append("s")
+        disaster_location.append("Southern")
 
     if len(disaster_location) == 1:
         return disaster_location[0]
@@ -263,7 +265,18 @@ def geo_locator(disaster_name):
 
 def fill_one_region(dataframe, region_name):
     """
-    docs
+    Given a dataframe and the name of a region of the U.S., return a dataframe
+    for all of the natural disasters that have affected that region (at this
+    point all natural disasters have been tied to a location by the geo locator
+    function).
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and their
+        regional designations.
+        region_name: a string representing the name of a U.S. region.
+
+    Returns: A dataframe with all of the natural disasters that have affected
+    the region.
     """
     region_df = pd.DataFrame(
         columns=[
@@ -283,7 +296,19 @@ def fill_one_region(dataframe, region_name):
 
 def fill_all_regions(dataframe, region_list):
     """
-    docs
+    Given a dataframe and the list of U.S. regions described in the geo locator
+    function, call the fill_one_region function and return a list with one
+    dataframe per region (four total) that contains all of the natural
+    disasters that have affected the region.
+
+    Args:
+        dataframe: a dataframe containing a list of disasters and their
+        regional designations.
+        region_list: a list of strings representing the names of all U.S.
+        regions.
+
+    Returns: A list of dataframes by region with the natural disasters that
+    affected each region.
     """
     df_list = {}
     for region_name in region_list:
@@ -294,15 +319,14 @@ def fill_all_regions(dataframe, region_list):
 # these split functions can be used to get yearly and disasterly dataframes
 def generic_split_data(dataframe, split_by, child_group_set):
     """
-    function that takes a dataframe of information and splits it into
-    multiple child dataframes based on information in a particular
-    column.
+    Given a dataframe of information, splits it into multiple child dataframes
+    based on information in a particular column.
 
     Args:
-    split_by: a string representing the column containing the information
-    with which to split up the dataframe.
-    child_group_set: a list representing the groups of data that each child
-    dataframe will contain.
+        split_by: a string representing the column containing the information
+        with which to split up the dataframe.
+        child_group_set: a list representing the groups of data that each child
+        dataframe will contain.
 
     Returns: A list of child dataframes that are each distinct from each
     other in some particular column.
@@ -316,8 +340,8 @@ def generic_split_data(dataframe, split_by, child_group_set):
 
 def split_by_year(dataframe):
     """
-    Function that takes a dataframe and splits it into multiple child
-    dataframes by disaster starting year.
+    Given a dataframe, splits it into multiple child dataframes by disaster
+    starting year.
 
     Args:
         dataframe: a dataframe containing dated disasters. Note: this function
@@ -334,8 +358,8 @@ def split_by_year(dataframe):
 
 def split_by_disaster(dataframe):
     """
-    Function that takes a dataframe and splits it into multiple child
-    dataframes by disaster type.
+    Given a dataframe, splits it into multiple chil dataframes by disaster
+    type.
 
     Args:
         dataframe: a dataframe containing disasters and their types.
@@ -358,9 +382,9 @@ def generic_sum_by_type(dataframe, desired_sum):
         dataframe: the dataframe to parse.
         desired_sum: a string representing the numerical value to sum up
         across disasters.
-    Returns:
-        An int representing the sum of the requested value for all of the
-        disasters within the supplied dataframe.
+
+    Returns: An int representing the sum of the requested value for all of the
+    disasters within the supplied dataframe.
     """
     sum_value = 0
     for _, event in dataframe.iterrows():
@@ -375,24 +399,23 @@ def death_by_sum(dataframe):
 
     Args:
         dataframe: the dataframe to parse.
-    Returns:
-        An int representing the sum of the total deaths for all of the
-        disasters of a certain type within the supplied dataframe.
+
+    Returns: An int representing the sum of the total deaths for all of the
+    disasters of a certain type within the supplied dataframe.
     """
     return generic_sum_by_type(dataframe, "Deaths")
 
 
 def cost_by_sum(dataframe):
     """
-    Given a frame of data, comb through
-    each event of the supplied type and sum up their total CPI-adjusted
-    cost.
+    Given a frame of data, comb through each event of the supplied type and sum
+    up their total CPI-adjusted cost.
 
     Args:
         dataframe: the dataframe to parse.
-    Returns:
-        An int representing the sum of the CPI-adjusted cost for all of the
-        disasters of a certain type within the supplied dataframe.
+
+    Returns: An int representing the sum of the CPI-adjusted cost for all of the
+    disasters of a certain type within the supplied dataframe.
     """
     return generic_sum_by_type(
         dataframe,
@@ -426,6 +449,10 @@ def sum_years_in_buckets(num_list, bucket_size):
 
 def assemble_one_disaster(dataframe, yrs, yr_buckets):
     """
+    Given a dataframe, a list with a range of years, and a number that
+    determines how to group/divide the year list, return a pair of arrays with
+    cost per disaster and deaths per disaster.
+
     Args:
         dataframe: A dataframe containing information of a single disaster
         type within a single region; the data spans all years.
@@ -464,6 +491,11 @@ def assemble_one_disaster(dataframe, yrs, yr_buckets):
 
 def assemble_region_data(dataframe, yrs, drs, yr_buckets):
     """
+    Given a dataframe, a list with a range of years, a list of all disaster
+    types and a number that determines how to group/divide the year list,
+    returns a pair of dictionaries with cost and deaths per each disaster type,
+    sorted chronologically.
+
     Args:
         dataframe: a dataframe containing information of all disasters across
         all years within a single US region.
@@ -505,9 +537,10 @@ def assemble_region_data(dataframe, yrs, drs, yr_buckets):
 
 def organize_regions(region_dict, yrs, drs, buckets):
     """
-    A function that takes a dictionary containing regional data and returns
-    that data sorted such that it is easily plottable by year, disaster type,
-    and region.
+    Given a dataframe, a list with a range of years, a list of all disaster
+    types and a number that determines how to group/divide the year list,
+    return the data reformatted so that it is easily plottable by year,
+    disaster type, and region.
 
     Args:
         region_dict: a dictionary in which the keys are the names of US regions
