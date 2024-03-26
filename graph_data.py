@@ -5,7 +5,7 @@ Functions that graph pre-processed data.
 import pandas as pd
 
 
-def plot_one_region(dataframe):
+def plot_dataframe(dataframe):
     """
     Plots a region dataframe.
     """
@@ -40,17 +40,14 @@ def plottable_by_time(region_dict, region_name, year_buckets):
         damages across each unit of time.
         region_name: A string representing the name of a particular region
         whose data will be copied into a plottable dataframe.
-        year_buckets: A list representing the buckets of time we are using
-        for the purposes of the plot.
 
     Returns: A dataframe that can be easily plotted such that the x-axis
     is in years and the y-axis is damages (cost or deaths works).
     """
     disasters_dict = region_dict[region_name]
     print(disasters_dict)
-    plottable_df = pd.DataFrame.from_dict(
-        disasters_dict, orient="index", columns=year_buckets
-    )
+    plottable_df = pd.DataFrame.from_dict(disasters_dict)
+    plottable_df.index = year_buckets
     return plottable_df
 
 
