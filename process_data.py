@@ -3,8 +3,8 @@ Helper functions for processing the data in our CSV into useful, bite-size
 dataframes that can be used to plot information.
 """
 
-import pandas as pd
 import math
+import pandas as pd
 
 
 # this function writes the csv to a variable
