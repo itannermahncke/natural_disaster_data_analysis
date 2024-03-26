@@ -206,19 +206,19 @@ def geo_locator(disaster_name):
 
     for s_key in south_set:
         if s_key in disaster_name:
-            disaster_location.append("s")
+            disaster_location.append("Southern")
             break
     for w_key in west_set:
         if w_key in disaster_name:
-            disaster_location.append("w")
+            disaster_location.append("Western")
             break
     for m_key in midwest_set:
         if m_key in disaster_name:
-            disaster_location.append("m")
+            disaster_location.append("Midwestern")
             break
     for n_key in northeast_set:
         if n_key in disaster_name:
-            disaster_location.append("n")
+            disaster_location.append("Northern")
             break
 
     if (

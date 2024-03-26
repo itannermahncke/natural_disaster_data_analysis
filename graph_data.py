@@ -5,26 +5,11 @@ Functions that graph pre-processed data.
 import pandas as pd
 
 
-def plot_dataframe(dataframe):
+def plot_dataframe(dataframe, rotation):
     """
     Plots a region dataframe.
     """
-    dataframe.plot.bar(rot=90, stacked=True)
-
-
-def test_plot():
-    """
-    fjkdfkk
-    """
-    speed = [0.1, 17.5, 40, 48, 52, 69, 88]
-
-    lifespan = [2, 8, 70, 1.5, 25, 12, 28]
-
-    index = ["snail", "pig", "elephant", "rabbit", "giraffe", "coyote", "horse"]
-
-    df = pd.DataFrame({"speed": speed, "lifespan": lifespan}, index=index)
-
-    return df
+    dataframe.plot.bar(rot=rotation, stacked=True)
 
 
 def plottable_by_time(region_dict, region_name, year_buckets):
