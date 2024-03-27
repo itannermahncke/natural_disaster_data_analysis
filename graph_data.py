@@ -6,10 +6,11 @@ pandas is used to manipulate pandas dataframes so they can be turned into
 effective visualizations.
 """
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def plot_dataframe(dataframe, rotation):
+def plot_dataframe(dataframe, rotation, labels):
     """
     Given a dataframe and an int to help determine the orientation of the
     graph, plot a bar plot from the dataframe.
@@ -18,8 +19,17 @@ def plot_dataframe(dataframe, rotation):
         dataframe: A dataframe containing the data to plot.
         rotation: An int representing the angle by which to rotate the graph if
         necessary.
+        labels: A list of strings in which the first item is the x-axis label
+        and the second item is the y-axis label, and the third item is the graph
+        title.
     """
-    dataframe.plot.bar(rot=rotation, stacked=True)
+    dataframe.plot.bar(
+        rot=rotation,
+        stacked=True,
+        xlabel=labels[0],
+        ylabel=labels[1],
+        title=labels[2],
+    )
 
 
 def plottable_by_time(region_dict, region_name, year_buckets):
