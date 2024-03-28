@@ -4,6 +4,9 @@ Functions that graph pre-processed data.
 This file uses one import to help graph the data: pandas.
 pandas is used to manipulate pandas dataframes so they can be turned into
 effective visualizations.
+
+This file is not worth pytesting because it's simply re-structuring data to
+be plotted and is not worth the effort for the test cases.
 """
 
 import pandas as pd
