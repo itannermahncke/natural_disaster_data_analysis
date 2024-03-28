@@ -123,8 +123,8 @@ def geo_locator(disaster_name):
         dataframe.
 
     Returns: A string indicating the region the disaster affected:
-    "Northeastern", "Western", "Midwestern", "Southern", or "empty" if a region could not be determined.
-    order, as strings.
+    "Northeastern", "Western", "Midwestern", "Southern", or "empty" if a region
+    could not be determined.
     """
     disaster_location = []
     south_set = [
@@ -252,8 +252,8 @@ def geo_locator(disaster_name):
         # These two disasters both had names that the function could not parse
         # effectively, but are clear to a human reader that they belong in the
         # south.
-        disaster_name in "North/Central Texas Hail Storm (April 2016)"
-        or disaster_name in "North Texas Hail Storm (March 2016)"
+        "North/Central Texas Hail Storm (April 2016)" in disaster_name
+        or "North Texas Hail Storm (March 2016)" in disaster_name
     ):
         disaster_location.clear()
         disaster_location.append("Southern")
@@ -386,7 +386,7 @@ def generic_sum_by_type(dataframe, desired_sum):
     Returns: An int representing the sum of the requested value for all of the
     disasters within the supplied dataframe.
     """
-    sum_value = 0
+    sum_value = float(0)
     for _, event in dataframe.iterrows():
         sum_value += float(event[desired_sum])
     return sum_value

@@ -8,6 +8,9 @@ requests is used to query the National Centers for Environmental Information
 (NCEI) for the dataset that we want to use and put it in a folder (line 24).
 tarfile is used to extract the data (line 33) from its natural format
 (a tar file that upon extraction yields a csv we can analyze with pandas).
+
+This file is not worth pytesting because it only has one function with no
+return statement.
 """
 
 import tarfile
