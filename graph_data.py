@@ -6,7 +6,6 @@ pandas is used to manipulate pandas dataframes so they can be turned into
 effective visualizations.
 """
 
-import matplotlib.pyplot as plt
 import pandas as pd
 
 
