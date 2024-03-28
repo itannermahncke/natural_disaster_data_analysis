@@ -123,7 +123,8 @@ def geo_locator(disaster_name):
         dataframe.
 
     Returns: A string indicating the region the disaster affected:
-    "Northeastern", "Western", "Midwestern", "Southern", or "empty" if a region could not be determined.
+    "Northeastern", "Western", "Midwestern", "Southern", or "empty" if a region
+    could not be determined.
     order, as strings.
     """
     disaster_location = []
