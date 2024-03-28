@@ -9,10 +9,11 @@ This file is not worth pytesting because it's simply re-structuring data to
 be plotted and is not worth the effort for the test cases.
 """
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def plot_dataframe(dataframe, rotation):
+def plot_dataframe(dataframe, rotation, labels):
     """
     Given a dataframe and an int to help determine the orientation of the
     graph, plot a bar plot from the dataframe.
@@ -21,8 +22,17 @@ def plot_dataframe(dataframe, rotation):
         dataframe: A dataframe containing the data to plot.
         rotation: An int representing the angle by which to rotate the graph if
         necessary.
+        labels: A list of strings in which the first item is the x-axis label
+        and the second item is the y-axis label, and the third item is the graph
+        title.
     """
-    dataframe.plot.bar(rot=rotation, stacked=True)
+    dataframe.plot.bar(
+        rot=rotation,
+        stacked=True,
+        xlabel=labels[0],
+        ylabel=labels[1],
+        title=labels[2],
+    )
 
 
 def plottable_by_time(region_dict, region_name, year_buckets):
@@ -45,7 +55,6 @@ def plottable_by_time(region_dict, region_name, year_buckets):
     is in years and the y-axis is damages (cost or deaths works).
     """
     disasters_dict = region_dict[region_name]
-    print(disasters_dict)
     plottable_df = pd.DataFrame.from_dict(disasters_dict)
     plottable_df.index = year_buckets
     return plottable_df
